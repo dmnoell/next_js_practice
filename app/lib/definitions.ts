@@ -86,3 +86,8 @@ export type InvoiceForm = {
   amount: number;
   status: 'pending' | 'paid';
 };
+
+export type BiggestBuy = {
+  name: string;
+  amount: number;
+}

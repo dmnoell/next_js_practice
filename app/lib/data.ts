@@ -6,8 +6,21 @@ import {
   InvoicesTable,
   LatestInvoiceRaw,
   Revenue,
+  BiggestBuy,
 } from './definitions';
 import { formatCurrency } from './utils';
+
+export async function fetchCustomerBiggestBuy() {
+  try {
+    const data = await sql<BiggestBuy>`SELECT * FROM biggestbuy`;
+    
+    return data.rows;
+  } catch (error) {
+    console.error('Database Error:', error);
+    throw new Error('Failed to fetch biggest buy data.');
+  }
+
+}
 
 export async function fetchRevenue() {
   try {
