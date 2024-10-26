@@ -106,32 +106,34 @@ async function seedBiggestBuy() {
   await client.sql`
     CREATE TABLE IF NOT EXISTS biggestBuy (
       name VARCHAR(255) NOT NULL UNIQUE,
-      amount INT NOT NULL
+      amount INT NOT NULL,
+      image_url VARCHAR(255) NOT NULL
     );
   `;
 
   // Fetch the biggest purchase for each customer
   const { rows: biggestBuy } = await client.sql`
-    SELECT customers.name AS name, MAX(invoices.amount) AS amount
+    SELECT customers.name AS name, MAX(invoices.amount) AS amount, customers.image_url AS image_url
     FROM customers
     JOIN invoices ON customers.id = invoices.customer_id
-    GROUP BY customers.name;
+    GROUP BY customers.name, customers.image_url;
   `;
 
   // Safeguard against an empty result set
   if (!biggestBuy || biggestBuy.length === 0) return [];
 
   // Insert the biggest purchases into the biggestBuy table
-  const insertedBuys = await Promise.all(
+  await Promise.all(
     biggestBuy.map((purchase) =>
       client.sql`
-        INSERT INTO biggestBuy (name, amount)
-        VALUES (${purchase.name}, ${purchase.amount});
+        INSERT INTO biggestBuy (name, amount, image_url)
+        VALUES (${purchase.name}, ${purchase.amount}, ${purchase.image_url})
+        ON CONFLICT (name) DO NOTHING;
       `
     )
   );
 
-  return insertedBuys;
+  return biggestBuy; // Optionally return the inserted purchases
 }
 
 

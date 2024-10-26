@@ -90,4 +90,5 @@ export type InvoiceForm = {
 export type BiggestBuy = {
   name: string;
   amount: number;
+  image_url: string;
 }
